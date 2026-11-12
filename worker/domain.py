@@ -2,10 +2,6 @@ from decimal import Decimal, ROUND_DOWN
 
 
 def calculate_operation(operation, balance, purchase=None, already_returned=False):
-    """
-    Доменная логика бонусной программы.
-    Здесь нет импортов SQLAlchemy и aio-pika.
-    """
     balance = Decimal(balance)
     points_delta = 0
     reject_reason = None
@@ -23,8 +19,6 @@ def calculate_operation(operation, balance, purchase=None, already_returned=Fals
     elif operation["type"] == "return":
         if purchase is None:
             reject_reason = "purchase_not_found"
-        elif purchase.customer_id != operation["customer_id"]:
-            reject_reason = "customer_mismatch"
         elif already_returned:
             reject_reason = "already_returned"
         else:

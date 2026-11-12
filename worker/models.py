@@ -18,6 +18,15 @@ class Account(Base):
     )
 
 
+class ReceiptCounter(Base):
+    __tablename__ = "receipt_counter"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    last_number: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0
+    )
+
+    
 class Operation(Base):
     __tablename__ = "operations"
 
@@ -35,7 +44,6 @@ class Operation(Base):
     processed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
 
-# Уникальность номера чека проверяется только среди принятых покупок.
 Index(
     "uq_purchase_check",
     Operation.check_number,

@@ -29,7 +29,7 @@ class OperationRequest(BaseModel):
     type: Literal["purchase", "return", "redeem"]
     customer_id: str = Field(min_length=1)
     store_id: str = Field(min_length=1)
-    check_number: str = Field(min_length=1)
+    check_number: str | None = None
     amount: Decimal | None = None
     points: int | None = None
     occurred_at: datetime
@@ -58,6 +58,8 @@ class OperationRequest(BaseModel):
             raise ValueError("Для redeem обязательно поле points")
         if self.type != "redeem" and self.points is not None:
             raise ValueError("Поле points допускается только для redeem")
+        if self.type == "return" and not self.check_number:
+            raise ValueError("Для возврата обязательно поле check_number")
         return self
 
 
@@ -126,6 +128,7 @@ async def get_operation(operation_id: str):
             "points_delta": item.points_delta,
             "balance_after": str(item.balance_after),
             "reject_reason": item.reject_reason,
+            "check_number": item.check_number,
         }
 
 
@@ -160,6 +163,7 @@ async def get_account(customer_id: str):
                     "reject_reason": item.reject_reason,
                     "occurred_at": item.occurred_at.isoformat(),
                     "processed_at": item.processed_at.isoformat(),
+                    "check_number": item.check_number,
                 }
                 for item in operations
             ],
